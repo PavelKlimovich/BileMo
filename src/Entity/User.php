@@ -45,7 +45,7 @@ class User
     #[ORM\Column(type: 'string', length: 255)]
     private string $country;
     
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: 'string')]
     private string $zipCode;
 
     #[ORM\Column(type: 'string', length: 255)]
@@ -156,12 +156,12 @@ class User
         return $this;
     }
 
-    public function getZipCode(): int
+    public function getZipCode(): string
     {
         return $this->zipCode;
     }
 
-    public function setZipCode(int $zipCode): self
+    public function setZipCode(string $zipCode): self
     {
         $this->zipCode = $zipCode;
 
