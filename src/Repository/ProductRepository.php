@@ -50,8 +50,7 @@ class ProductRepository extends ServiceEntityRepository
 //            ->orderBy('p.id', 'ASC')
 //            ->setMaxResults(10)
 //            ->getQuery()
-//            ->getResult()
-//        ;
+//            ->getResult();
 //    }
 
 //    public function findOneBySomeField($value): ?Product
@@ -60,7 +59,6 @@ class ProductRepository extends ServiceEntityRepository
 //            ->andWhere('p.exampleField = :val')
 //            ->setParameter('val', $value)
 //            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
+//            ->getOneOrNullResult();
 //    }
 }
