@@ -2,57 +2,53 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UserRepository;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    #[Assert\NotBlank]
+    #[ORM\Column(type: 'string',nullable: true, length: 255)]
     #[Assert\Regex(pattern: "/([@$!%*#?&;\/.,%£`'(){}0-9]+)$/",
         match: false,
-        message: "Le prénom ne peut pas contenir de chiffre ou de caractère spécial.")]//does not contain any special character or number
-    private $firstName;
+        message: "Le prénom ne peut pas contenir de chiffre ou de caractère spécial.")]
+    private ?string $firstName = null;
 
+    #[ORM\Column(type: 'string',nullable: true, length: 255)]
+    #[Assert\Regex(pattern:"/([@$!%*#?&;\/.,%£`'(){}0-9]+)$/",
+        match: false,
+        message: "Le Nom de famille ne peut pas contenir de chiffre ou de caractère spécial.")]
+    private ?string $lastName = null;
+    
+    #[ORM\Column(length: 180, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Email(message:'L\'adresse mail fournie n\'est pas un format valide')]
+    private string $email;
+
+    #[ORM\Column]
+    private array $roles = [];
+
+    /**
+     * @var string The hashed password
+     */
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank]
-    #[Assert\Regex(pattern:"/([@$!%*#?&;\/.,%£`'(){}0-9]+)$/",
-        match:false,
-        message: "Le Nom de famille ne peut pas contenir de chiffre ou de caractère spécial.")]//does not contain any special character or number
-    private $lastName;
+    #[Assert\Length(min:8)]
+    #[Assert\Regex('[@$!%*#?&]')]
+    private string $password;
     
-    #[ORM\Column(type: 'string', length: 255)]
-    private string $email;
-    
-    #[ORM\Column(type: 'string', length: 255)]
-    private string $street;
-    
-    #[ORM\Column(type: 'string', length: 255)]
-    private ?string $streetBis = null;
-    
-    #[ORM\Column(type: 'string', length: 255)]
-    private string $city;
-
-    #[ORM\Column(type: 'string', length: 255)]
-    private string $country;
-    
-    #[ORM\Column(type: 'string')]
-    private string $zipCode;
-
-    #[ORM\Column(type: 'string', length: 255)]
-    private string $phoneNumber;
-
     #[ORM\ManyToOne(targetEntity: Customer::class, inversedBy: 'users')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private $customer;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, options : ['default' => 'CURRENT_TIMESTAMP'])]
@@ -96,86 +92,21 @@ class User
         return $this;
     }
 
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
     public function setEmail(string $email): self
     {
         $this->email = $email;
 
         return $this;
     }
-
-    public function getStreet(): string
+    
+    public function getEmail(): string
     {
-        return $this->street;
+        return $this->email;
     }
 
-    public function setStreet(string $street): self
+    public function setCustomer(?Customer $customer): self
     {
-        $this->street = $street;
-
-        return $this;
-    }
-
-    public function getStreetBis(): ?string
-    {
-        return $this->streetBis;
-    }
-
-    public function setStreetBis(string $streetBis): self
-    {
-        $this->streetBis = $streetBis;
-
-        return $this;
-    }
-
-    public function getCity(): string
-    {
-        return $this->city;
-    }
-
-    public function setCity(string $city): self
-    {
-        $this->city = $city;
-
-        return $this;
-    }
-
-    public function getCountry(): string
-    {
-        return $this->country;
-    }
-
-    public function setCountry(string $country): self
-    {
-        $this->country = $country;
-
-        return $this;
-    }
-
-    public function getZipCode(): string
-    {
-        return $this->zipCode;
-    }
-
-    public function setZipCode(string $zipCode): self
-    {
-        $this->zipCode = $zipCode;
-
-        return $this;
-    }
-
-    public function getPhoneNumber(): string
-    {
-        return $this->phoneNumber;
-    }
-
-    public function setPhoneNumber(string $phoneNumber): self
-    {
-        $this->phoneNumber = $phoneNumber;
+        $this->customer = $customer;
 
         return $this;
     }
@@ -185,9 +116,36 @@ class User
         return $this->customer;
     }
 
-    public function setCustomer(?Customer $customer): self
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
     {
-        $this->customer = $customer;
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_CUSTOMER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
 
         return $this;
     }
@@ -214,5 +172,33 @@ class User
         $this->createdAt = $updatedAt;
 
         return $this;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
+
+    /**
+     * Méthode getUsername qui permet de retourner le champ qui est utilisé pour l'authentification.
+     *
+     * @return string
+     */
+    public function getUsername(): string {
+        return $this->getUserIdentifier();
     }
 }
