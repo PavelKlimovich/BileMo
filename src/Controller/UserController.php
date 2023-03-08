@@ -23,7 +23,7 @@ class UserController extends AbstractController
         $this->serializer = $serializer;
     }
 
-    #[Route('/api/customers/{id}/users', name: 'product_list')]
+    #[Route('/customers/{id}/users', name: 'product_list')]
     public function index(int $id): JsonResponse
     {   
         $customer = $this->userService->ifAuthorisation($id);
