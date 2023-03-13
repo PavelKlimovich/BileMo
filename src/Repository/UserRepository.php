@@ -56,7 +56,13 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->save($user, true);
     }
 
-    public function getUsersForCustomer(int $id)
+    /**
+     * Return users collection.
+     *
+     * @param integer $id
+     * @return array
+     */
+    public function getUsersForCustomer(int $id): array
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.customer = :val')
@@ -67,4 +73,23 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getResult();
     }
 
+    /**
+     * Return user.
+     *
+     * @param integer $customerId
+     * @param integer $userId
+     * @return array
+     */
+    public function getUserForCustomer(int $customerId, int $userId): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.id = :id')
+            ->setParameter('id', $userId)
+            ->andWhere('u.customer = :val')
+            ->setParameter('val', $customerId)
+            ->andWhere('u.roles LIKE :role')
+            ->setParameter('role', '%ROLE_USER%')
+            ->getQuery()
+            ->getResult();
+    }
 }
