@@ -56,28 +56,40 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->save($user, true);
     }
 
-//    /**
-//     * @return User[] Returns an array of user objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * Return users collection.
+     *
+     * @param integer $id
+     * @return array
+     */
+    public function getUsersForCustomer(int $id): array
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.customer = :val')
+            ->setParameter('val', $id)
+            ->andWhere('u.roles LIKE :role')
+            ->setParameter('role', '%ROLE_USER%')
+            ->getQuery()
+            ->getResult();
+    }
 
-//    public function findOneBySomeField($value): ?User
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * Return user.
+     *
+     * @param integer $customerId
+     * @param integer $userId
+     * @return array
+     */
+    public function getUserForCustomer(int $customerId, int $userId): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.id = :id')
+            ->setParameter('id', $userId)
+            ->andWhere('u.customer = :val')
+            ->setParameter('val', $customerId)
+            ->andWhere('u.roles LIKE :role')
+            ->setParameter('role', '%ROLE_USER%')
+            ->getQuery()
+            ->getResult();
+    }
 }
