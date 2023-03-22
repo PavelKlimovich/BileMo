@@ -2,25 +2,42 @@
 
 namespace App\Services;
 
-use App\Repository\UserRepository;
+use App\Entity\Customer;
+use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserService 
 {
-    private UserRepository $userRepository; 
+    private UserPasswordHasherInterface $passwordHasher; 
+    private EntityManagerInterface $manager; 
 
-    public function __construct(UserRepository $userRepository) 
+    public function __construct(UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $manager)
     {
-        $this->userRepository = $userRepository;
+        $this->passwordHasher = $passwordHasher;
+        $this->manager = $manager;
     }
 
-    public function ifAuthorisation(int $id)
+    public function addNewEntity(User $user, Customer $customer): array
     {
-        $user = $this->userRepository->find($id);
+        $hashedPassword = $this->passwordHasher->hashPassword($user, $user->getPassword());
+        $user->setPassword($hashedPassword)
+            ->setRoles(['ROLE_USER'])
+            ->setCustomer($customer)
+            ->setCreatedAt(new \DateTime())
+            ->setUpdatedAt(new \DateTime());
 
-        if ($user->getRoles()[0] == 'ROLE_CUSTOMER' && $user->getId() == $id) {
-           return $user->getCustomer();
-        }
+        $this->manager->persist($user);
+        $this->manager>flush();
+        dd($user);
+        return [$user];
+    }
 
-        return null;
+    public function deleteEntity(User $user): bool
+    {
+        $this->manager->remove($user);
+        $this->manager->flush();
+
+        return true;
     }
 }
