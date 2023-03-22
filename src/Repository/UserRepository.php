@@ -66,8 +66,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.customer = :val')
-            ->setParameter('val', $id)
             ->andWhere('u.roles LIKE :role')
+            ->setParameter('val', $id)
             ->setParameter('role', '%ROLE_USER%')
             ->getQuery()
             ->getResult();
@@ -84,10 +84,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         return $this->createQueryBuilder('u')
             ->where('u.id = :id')
-            ->setParameter('id', $userId)
             ->andWhere('u.customer = :val')
-            ->setParameter('val', $customerId)
             ->andWhere('u.roles LIKE :role')
+            ->setParameter('val', $customerId)
+            ->setParameter('id', $userId)
             ->setParameter('role', '%ROLE_USER%')
             ->getQuery()
             ->getResult();
