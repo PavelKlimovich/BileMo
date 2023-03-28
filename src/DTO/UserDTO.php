@@ -2,18 +2,22 @@
 
 namespace App\DTO;
 
+use DateTime;
+
 class UserDTO
 {   
     public int $id;
-    public string $firstName;
-    public string $lastName;
+    public string $firstname;
+    public string $lastname;
+    public string $email;
     public object $createdAt;
 
     public function __construct(mixed $user) 
     {
         $this->id = $user->getId();
-        $this->firstName = $user->getFirstName();
-        $this->lastName = $user->getLastName();
+        $this->firstname = $user->getFirstName();
+        $this->email = $user->getEmail();
+        $this->lastname = $user->getLastName();
         $this->createdAt = $user->getCreatedAt();
     }
 

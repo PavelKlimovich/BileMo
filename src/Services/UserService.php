@@ -2,41 +2,40 @@
 
 namespace App\Services;
 
-use App\Entity\Customer;
 use App\Entity\User;
+use App\Entity\Customer;
+use Doctrine\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserService 
 {
     private UserPasswordHasherInterface $passwordHasher; 
-    private EntityManagerInterface $manager; 
+    private EntityManagerInterface $entityManager; 
 
-    public function __construct(UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $manager)
+    public function __construct(UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $entityManager)
     {
         $this->passwordHasher = $passwordHasher;
-        $this->manager = $manager;
+        $this->entityManager = $entityManager;
     }
 
-    public function addNewEntity(User $user, Customer $customer): array
+    public function addNewUser(User $user, Customer $customer, EntityManagerInterface $entityManager): array
     {
         $hashedPassword = $this->passwordHasher->hashPassword($user, $user->getPassword());
-        $user->setPassword($hashedPassword)
-            ->setRoles(['ROLE_USER'])
+        $user->setRoles(['ROLE_USER'])
             ->setCustomer($customer)
-            ->setCreatedAt(new \DateTime())
-            ->setUpdatedAt(new \DateTime());
+            ->setPassword($hashedPassword);
 
-        $this->manager->persist($user);
-        $this->manager>flush();
-        dd($user);
+        $entityManager->persist($user);
+        $entityManager->flush();
+
         return [$user];
     }
 
     public function deleteEntity(User $user): bool
     {
-        $this->manager->remove($user);
-        $this->manager->flush();
+        $this->entityManager->remove($user);
+        $this->entityManager->flush();
 
         return true;
     }

@@ -8,12 +8,14 @@ use App\Entity\Customer;
 use App\Services\UserService;
 use App\Services\SecurityService;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('customers')]
@@ -74,7 +76,7 @@ class VisitorController extends AbstractController
     }
 
     #[Route('/{id}/users', name: 'user_store', methods: ['POST'])]
-    public function store(Customer $customer, Request $request): JsonResponse
+    public function store(Customer $customer, Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {  
         if (!$customer) {
             return new JsonResponse(null, Response::HTTP_NOT_FOUND);
@@ -83,9 +85,15 @@ class VisitorController extends AbstractController
         if (!$this->securityService->ifAuthorisation($customer)) {
             return new JsonResponse(['message' => '401 Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
-
+  
         $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
-        $user = $this->userService->addNewEntity($user, $customer);
+        $errors = $validator->validate($user);
+
+        if ($errors->count() > 0) {
+            return new JsonResponse($this->serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+        }
+
+        $user = $this->userService->addNewUser($user, $customer, $entityManager);
         $userDTO = UserDTO::init($user);
         $jsonUser = $this->serializer->serialize($userDTO, 'json');
         
