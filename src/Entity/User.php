@@ -6,17 +6,21 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
+/**
+ * @UniqueEntity(fields={"email"}, message="It looks like your already have an account!")
+ */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private int $id;
 
     #[ORM\Column(type: 'string',nullable: true, length: 255)]
     #[Assert\Regex(pattern: "/([@$!%*#?&;\/.,%£`'(){}0-9]+)$/",
@@ -43,8 +47,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank]
-    #[Assert\Length(min:8)]
-    #[Assert\Regex('[@$!%*#?&]')]
+    #[Assert\Length(min:8,
+    minMessage: 'Le mot de passe doit avoir 8 caracteres minimux et avoir un caractere speciale.'
+    )]
     private string $password;
     
     #[ORM\ManyToOne(targetEntity: Customer::class, inversedBy: 'users')]
@@ -66,6 +71,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+        return $this;
     }
 
     public function getFirstName(): ?string
