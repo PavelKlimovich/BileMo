@@ -40,7 +40,7 @@ class VisitorController extends AbstractController
     }
 
     #[Route('/{id}/users', name: 'users_list', methods: ['GET'])]
-    public function index(Customer $customer): JsonResponse
+    public function index(Customer $customer, Request $request): JsonResponse
     {  
         if (!$customer) {
             return new JsonResponse(null, Response::HTTP_NOT_FOUND);
@@ -49,8 +49,10 @@ class VisitorController extends AbstractController
         if (!$this->securityService->ifAuthorisation($customer)) {
             return new JsonResponse(['message' => '401 Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
-
-        $users = $this->userRepository->getUsersForCustomer($customer->getId());
+        
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 10);
+        $users = $this->userRepository->getUsersForCustomer($customer->getId(), $page, $limit);
         $usersDTO = UserDTO::init($users);
         $jsonProducts = $this->serializer->serialize($usersDTO, 'json');
         

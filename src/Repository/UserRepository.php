@@ -62,13 +62,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      * @param integer $id
      * @return array
      */
-    public function getUsersForCustomer(int $id): array
+    public function getUsersForCustomer(int $id, int $page, int $limit): array
     {
         return $this->createQueryBuilder('u')
             ->andWhere('u.customer = :val')
             ->andWhere('u.roles LIKE :role')
             ->setParameter('val', $id)
             ->setParameter('role', '%ROLE_USER%')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
