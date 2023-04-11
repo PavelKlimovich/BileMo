@@ -117,10 +117,6 @@ class VisitorController extends AbstractController
     #[Route('/{id}/users', name: 'users_list', methods: ['GET'])]
     public function index(Customer $customer, Request $request): JsonResponse
     {
-        if (!$customer) {
-            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
-        }
-
         if (!$this->securityService->ifAuthorisation($customer)) {
             return new JsonResponse(['message' => '401 Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
@@ -183,10 +179,6 @@ class VisitorController extends AbstractController
     #[Route('/{id}/users/{user}', name: 'user_detail', methods: ['GET'])]
     public function show(Customer $customer, User $user): JsonResponse
     {
-        if (!$customer || !$user) {
-            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
-        }
-
         if (!$this->securityService->ifAuthorisation($customer)) {
             return new JsonResponse(['message' => '401 Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
@@ -259,10 +251,6 @@ class VisitorController extends AbstractController
     #[Route('/{id}/users', name: 'user_store', methods: ['POST'])]
     public function store(Customer $customer, Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
-        if (!$customer) {
-            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
-        }
-
         if (!$this->securityService->ifAuthorisation($customer)) {
             return new JsonResponse(['message' => '401 Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
@@ -337,10 +325,6 @@ class VisitorController extends AbstractController
     #[Route('/{id}/users/{user}', name: 'user_delete', methods: ['DELETE'])]
     public function deleteBook(Customer $customer, User $user): JsonResponse
     {
-        if (!$customer || !$user) {
-            return new JsonResponse(null, Response::HTTP_NOT_FOUND);
-        }
-
         if (!$this->securityService->ifAuthorisation($customer)) {
             return new JsonResponse(['message' => '401 Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }

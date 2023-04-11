@@ -2,21 +2,24 @@
 
 namespace App\Services;
 
+use App\Entity\User;
 use App\Entity\Customer;
 use Symfony\Bundle\SecurityBundle\Security;
 
-class SecurityService 
+class SecurityService
 {
-    private Security $security; 
+    private Security $security;
 
-    public function __construct(Security $security) 
+    public function __construct(Security $security)
     {
         $this->security = $security;
     }
 
     public function ifAuthorisation(Customer $customer): bool
     {
-        if ($this->security->getUser()?->getCustomer()?->getId() == $customer->getId()) {
+        /** @var User $user */
+        $user = $this->security->getUser();
+        if ($user->getCustomer()?->getId() == $customer->getId()) {
             return true;
         }
 
