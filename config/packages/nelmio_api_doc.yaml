@@ -5,7 +5,7 @@ nelmio_api_doc:
             description: Premium Mobile phone catalogue for your customer.
             version: 1.0.1
         paths:
-            /api/login:
+            /api/login_check:
                 post:
                     operationId: postCredentialsItem
                     tags:
