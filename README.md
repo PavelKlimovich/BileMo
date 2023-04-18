@@ -59,20 +59,19 @@ Install ***LexikJWT*** : `composer require lexik/jwt-authentication-bundle`
  >JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem`
 JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem 
  JWT_PASSPHRASE=fdd719e8855fdf770a5141fd0afb817b`
-### > lexik/jwt-authentication-bundle ###
-<hr>
 
-To test the API you will need a token
-
-Go to https://127.0.0.1:8000/api/doc
-
-add :
-
-"username":"admin@pommemail.com",
-"password":"123456"
 
 ## Use API
 
 ### Documentation access
 
-> API Documentation :  http://yourAdress.domain.fr/doc/api
+To test the API you will need a token
+
+Go to https://127.0.0.1:8000/api/doc
+
+
+## Admin connection access
+
+"username": `admin@bilemo.fr`,
+"password": `password`
+

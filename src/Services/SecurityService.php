@@ -19,6 +19,7 @@ class SecurityService
     {
         /** @var User $user */
         $user = $this->security->getUser();
+
         if ($user->getCustomer()?->getId() == $customer->getId()) {
             return true;
         }
