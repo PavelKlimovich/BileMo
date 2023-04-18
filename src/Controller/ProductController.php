@@ -73,8 +73,7 @@ class ProductController extends AbstractController
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 10);
         $products = $this->productRepository->findAllWithPagination($page, $limit);
-        $productsDTO = ProductDTO::init($products);
-        $jsonProducts = $this->serializer->serialize($productsDTO, 'json');
+        $jsonProducts = $this->serializer->serialize(ProductDTO::init($products), 'json');
 
         return new JsonResponse($jsonProducts, Response::HTTP_OK, ['accept' => 'json'], true);
     }
@@ -115,8 +114,7 @@ class ProductController extends AbstractController
     #[Route('/{id}', name: 'product_detail', methods: ['GET'])]
     public function getProductDetail(Product $product): JsonResponse
     {
-        $productsDTO = new ProductDTO($product);
-        $jsonProduct = $this->serializer->serialize($productsDTO, 'json');
+        $jsonProduct = $this->serializer->serialize(new ProductDTO($product), 'json');
 
         return new JsonResponse($jsonProduct, Response::HTTP_OK, [], true);
     }
