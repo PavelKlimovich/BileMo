@@ -1,4 +1,4 @@
-
+.idea
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -9,6 +9,8 @@
 /vendor/
 /composer.lock
 /symfony.lock
+/config/jwt/private.pem
+/config/jwt/public.pem
 
 ###< symfony/framework-bundle ###
 
