@@ -22,21 +22,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'integer')]
     private int $id;
 
-    #[ORM\Column(type: 'string',nullable: true, length: 255)]
-    #[Assert\Regex(pattern: "/([@$!%*#?&;\/.,%£`'(){}0-9]+)$/",
+    #[ORM\Column(type: 'string', nullable: true, length: 255)]
+    #[Assert\Regex(
+        pattern: "/([@$!%*#?&;\/.,%£`'(){}0-9]+)$/",
         match: false,
-        message: "Le prénom ne peut pas contenir de chiffre ou de caractère spécial.")]
+        message: "Le prénom ne peut pas contenir de chiffre ou de caractère spécial."
+    )]
     private ?string $firstName = null;
 
-    #[ORM\Column(type: 'string',nullable: true, length: 255)]
-    #[Assert\Regex(pattern:"/([@$!%*#?&;\/.,%£`'(){}0-9]+)$/",
+    #[ORM\Column(type: 'string', nullable: true, length: 255)]
+    #[Assert\Regex(
+        pattern: "/([@$!%*#?&;\/.,%£`'(){}0-9]+)$/",
         match: false,
-        message: "Le Nom de famille ne peut pas contenir de chiffre ou de caractère spécial.")]
+        message: "Le Nom de famille ne peut pas contenir de chiffre ou de caractère spécial."
+    )]
     private ?string $lastName = null;
-    
+
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank]
-    #[Assert\Email(message:'L\'adresse mail fournie n\'est pas un format valide')]
+    #[Assert\Email(message: 'L\'adresse mail fournie n\'est pas un format valide')]
     private string $email;
 
     #[ORM\Column]
@@ -47,19 +51,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(type: 'string', length: 255)]
     #[Assert\NotBlank]
-    #[Assert\Length(min:8,
-    minMessage: 'Le mot de passe doit avoir 8 caracteres minimux et avoir un caractere speciale.'
+    #[Assert\Length(
+        min: 8,
+        minMessage: 'Le mot de passe doit avoir 8 caracteres minimux et avoir un caractere speciale.'
     )]
     private string $password;
-    
+
     #[ORM\ManyToOne(targetEntity: Customer::class, inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: true)]
     private $customer;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, options : ['default' => 'CURRENT_TIMESTAMP'])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, options : ['default' => 'CURRENT_TIMESTAMP'])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $updatedAt = null;
 
     public function __construct()
@@ -109,7 +114,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-    
+
     public function getEmail(): string
     {
         return $this->email;
@@ -132,11 +137,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_CUSTOMER';
-
-        return array_unique($roles);
+        return $this->roles;
     }
 
     public function setRoles(array $roles): self
@@ -209,7 +210,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return string
      */
-    public function getUsername(): string {
+    public function getUsername(): string
+    {
         return $this->getUserIdentifier();
     }
 }

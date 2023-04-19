@@ -14,21 +14,35 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
     private $faker;
     private $passwordHasher;
 
-    public function __construct(UserPasswordHasherInterface $passwordHasher) {
+    public function __construct(UserPasswordHasherInterface $passwordHasher)
+    {
         $this->faker = Factory::create();
         $this->passwordHasher = $passwordHasher;
     }
 
     public function load(ObjectManager $manager): void
     {
-        for ($i=0; $i < 10; $i++) {
+        $user = new User();
+        $plaintextPassword = 'password';
+        $hashedPassword = $this->passwordHasher->hashPassword($user, $plaintextPassword);
+        $user->setEmail('admin@bilemo.fr')
+            ->setPassword($hashedPassword)
+            ->setRoles(['ROLE_ADMIN'])
+            ->setCustomer(null)
+            ->setCreatedAt(new \DateTime())
+            ->setUpdatedAt(new \DateTime());
+
+        $manager->persist($user);
+        $manager->flush();
+
+        for ($i = 0; $i < 10; $i++) {
             $user = new User();
             $plaintextPassword = 'password';
             $hashedPassword = $this->passwordHasher->hashPassword($user, $plaintextPassword);
             $user->setEmail($this->faker->email())
                 ->setPassword($hashedPassword)
                 ->setRoles(['ROLE_CUSTOMER'])
-                ->setCustomer($this->getReference('customer'.random_int(1, 9)))
+                ->setCustomer($this->getReference('customer' . random_int(1, 9)))
                 ->setCreatedAt(new \DateTime())
                 ->setUpdatedAt(new \DateTime());
 
@@ -36,7 +50,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
             $manager->flush();
         }
 
-        for ($i=0; $i < 25; $i++) {
+        for ($i = 0; $i < 25; $i++) {
             $user = new User();
             $plaintextPassword = 'password';
             $hashedPassword = $this->passwordHasher->hashPassword($user, $plaintextPassword);
@@ -45,7 +59,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
                 ->setEmail($this->faker->email())
                 ->setPassword($hashedPassword)
                 ->setRoles(['ROLE_USER'])
-                ->setCustomer($this->getReference('customer'.random_int(1, 9)))
+                ->setCustomer($this->getReference('customer' . random_int(1, 9)))
                 ->setCreatedAt(new \DateTime())
                 ->setUpdatedAt(new \DateTime());
 
@@ -61,4 +75,3 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
         );
     }
 }
-

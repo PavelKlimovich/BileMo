@@ -11,6 +11,7 @@
         "doctrine/doctrine-bundle": "^2.8",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.14",
+        "jms/serializer": "^3.23",
         "lexik/jwt-authentication-bundle": "^2.17",
         "nelmio/api-doc-bundle": "^4.11",
         "phpdocumentor/reflection-docblock": "^5.3",
@@ -31,7 +32,8 @@
         "symfony/validator": "6.2.*",
         "symfony/yaml": "6.2.*",
         "twig/extra-bundle": "^2.12|^3.0",
-        "twig/twig": "^2.12|^3.0"
+        "twig/twig": "^2.12|^3.0",
+        "willdurand/hateoas-bundle": "^2.5"
     },
     "config": {
         "allow-plugins": {
@@ -82,7 +84,8 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",
-        "symfony/maker-bundle": "^1.48",
-        "fzaninotto/faker": "^1.5"
+        "fzaninotto/faker": "^1.5",
+        "phpstan/phpstan-symfony": "^1.2",
+        "symfony/maker-bundle": "^1.48"
     }
 }

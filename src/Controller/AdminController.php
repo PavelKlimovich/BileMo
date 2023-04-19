@@ -21,24 +21,21 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
 
-#[Route('customers')]
-#[IsGranted('ROLE_CUSTOMER', message: 'Vous devez être connecté en tant que client pour accéder à cette page.')]
-class VisitorController extends AbstractController
+#[Route('admin')]
+#[IsGranted('ROLE_ADMIN', message: 'Vous devez être connecté en tant que admin pour accéder à cette page.')]
+class AdminController extends AbstractController
 {
     private SerializerInterface $serializer;
     private UserRepository $userRepository;
-    private SecurityService $securityService;
     private UserService $userService;
 
     public function __construct(
         SerializerInterface $serializer,
         UserRepository $userRepository,
-        SecurityService $securityService,
         UserService $userService
     ) {
         $this->userRepository = $userRepository;
         $this->serializer = $serializer;
-        $this->securityService = $securityService;
         $this->userService = $userService;
     }
 
@@ -46,7 +43,7 @@ class VisitorController extends AbstractController
      * Get a list of users for a customer
      * 
      * @OA\Get(
-     *     path="/{id}/users",
+     *     path="/customers/{id}/users",
      *     summary="Get a list of users for a customer",
      *     tags={"Users"},
      * ),
@@ -106,7 +103,7 @@ class VisitorController extends AbstractController
      *      description="Not Found"
      * ),
      * 
-     * @OA\Tag(name="Customer")
+     * @OA\Tag(name="Admin")
      * 
      * 
      * @param Customer $customer
@@ -114,13 +111,9 @@ class VisitorController extends AbstractController
      * @return JsonResponse
      * 
      */
-    #[Route('/{id}/users', name: 'users_list', methods: ['GET'])]
+    #[Route('/customers/{id}/users', name: 'admin_users_list', methods: ['GET'])]
     public function index(Customer $customer, Request $request): JsonResponse
     {
-        if (!$this->securityService->ifAuthorisation($customer)) {
-            return new JsonResponse(['message' => '401 Unauthorized'], Response::HTTP_UNAUTHORIZED);
-        }
-
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 10);
         $users = $this->userRepository->getUsersForCustomer($customer->getId(), $page, $limit);
@@ -135,7 +128,7 @@ class VisitorController extends AbstractController
      * Get details of a user for a specific customer
      * 
      * @OA\Get(
-     *     path="/{id}/users/{user}",
+     *     path="/customers/{id}/users/{user}",
      *     summary="Get user details",
      *     description="Get details of a user for a specific customer",
      * ),
@@ -169,20 +162,16 @@ class VisitorController extends AbstractController
      *         response=401,
      *         description="Unauthorized"
      *     )
-     * @OA\Tag(name="Customer")
+     * @OA\Tag(name="Admin")
      * 
      * @param Customer $customer
      * @param User $user
      * @return JsonResponse
      * 
      */
-    #[Route('/{id}/users/{user}', name: 'user_detail', methods: ['GET'])]
+    #[Route('/customers/{id}/users/{user}', name: 'admin_user_detail', methods: ['GET'])]
     public function show(Customer $customer, User $user): JsonResponse
     {
-        if (!$this->securityService->ifAuthorisation($customer)) {
-            return new JsonResponse(['message' => '401 Unauthorized'], Response::HTTP_UNAUTHORIZED);
-        }
-
         $user = $this->userRepository->getUserForCustomer($customer->getId(), $user->getId());
         $usersDTO = UserDTO::init($user);
         $jsonProducts = $this->serializer->serialize($usersDTO, 'json');
@@ -194,7 +183,7 @@ class VisitorController extends AbstractController
      * Add a new user for a customer
      * 
      * @OA\Post(
-     *     path="/{id}/users",
+     *     path="/customers/{id}/users",
      *     summary="Add a new user for a customer",
      *     tags={"User"},
      * ),
@@ -239,7 +228,7 @@ class VisitorController extends AbstractController
      *         @OA\JsonContent(ref=@Model(type=ErrorResponse::class))
      *     )
      * )
-     * @OA\Tag(name="Customer")
+     * @OA\Tag(name="Admin")
      * 
      *  @param Customer $customer
      *  @param Request $request
@@ -248,13 +237,9 @@ class VisitorController extends AbstractController
      *  @return JsonResponse
      * 
      */
-    #[Route('/{id}/users', name: 'user_store', methods: ['POST'])]
+    #[Route('/customers/{id}/users', name: 'admin_user_store', methods: ['POST'])]
     public function store(Customer $customer, Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): JsonResponse
     {
-        if (!$this->securityService->ifAuthorisation($customer)) {
-            return new JsonResponse(['message' => '401 Unauthorized'], Response::HTTP_UNAUTHORIZED);
-        }
-
         $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
         $errors = $validator->validate($user);
 
@@ -273,7 +258,7 @@ class VisitorController extends AbstractController
      * Delete a user for a customer
      * 
      * @OA\Delete(
-     *     path="/{id}/users/{user}",
+     *     path="/customers/{id}/users/{user}",
      *     summary="Delete a user",
      * )
      *     @OA\Parameter(
@@ -314,7 +299,7 @@ class VisitorController extends AbstractController
      *         description="Not found"
      *     )
      * 
-     * @OA\Tag(name="Customer")
+     * @OA\Tag(name="Admin")
      * @Security(name="Bearer")
      * 
      * 
@@ -322,13 +307,9 @@ class VisitorController extends AbstractController
      *  @param User $user
      *  @return JsonResponse
      */
-    #[Route('/{id}/users/{user}', name: 'user_delete', methods: ['DELETE'])]
+    #[Route('/customers/{id}/users/{user}', name: 'admin_user_delete', methods: ['DELETE'])]
     public function deleteBook(Customer $customer, User $user): JsonResponse
     {
-        if (!$this->securityService->ifAuthorisation($customer)) {
-            return new JsonResponse(['message' => '401 Unauthorized'], Response::HTTP_UNAUTHORIZED);
-        }
-
         $this->userService->deleteEntity($user);
 
         return new JsonResponse(['message' => '204 No content'], Response::HTTP_NO_CONTENT);

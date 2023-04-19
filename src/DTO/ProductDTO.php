@@ -2,16 +2,21 @@
 
 namespace App\DTO;
 
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Annotations as OA;
+
 class ProductDTO
-{   
+{
     public int $id;
     public string $brand;
     public string $name;
     public float $price;
     public string $description;
     public object $createdAt;
+    public array $links;
 
-    public function __construct(mixed $product) 
+
+    public function __construct(mixed $product)
     {
         $this->id = $product->getId();
         $this->brand = $product->getBrand();
@@ -19,6 +24,17 @@ class ProductDTO
         $this->price = $product->getPrice();
         $this->description = $product->getDescription();
         $this->createdAt = $product->getCreatedAt();
+        $this->links = [
+            'self' => [
+                "href" =>  '/api/products/' . $this->id
+            ],
+            'update' => [
+                "href" =>  '/api/products/' . $this->id
+            ],
+            'delete' => [
+                "href" =>  '/api/products/' . $this->id
+            ]
+        ];
     }
 
     /**
@@ -31,8 +47,8 @@ class ProductDTO
     {
         $response = [];
 
-        foreach($products as $key => $product){
-           $response[$key] = new self($product);
+        foreach ($products as $key => $product) {
+            $response[$key] = new self($product);
         }
 
         return $response;
