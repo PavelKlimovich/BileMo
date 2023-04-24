@@ -29,6 +29,7 @@ example:
 `JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem`
 
 `JWT_PASSPHRASE=fdd719e8855fdf770a5141fd0afb817b`
+
 9. Run the server : `symfony server:start`
 
 ## Use API
